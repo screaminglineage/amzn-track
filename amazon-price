@@ -6,6 +6,7 @@ import argparse
 import json
 from bs4 import BeautifulSoup
 
+# Top level domain can be changed below
 TOP_LEVEL_DOMAIN = "in"
 AMAZON_PREFIX = f"https://www.amazon.{TOP_LEVEL_DOMAIN}"
 
