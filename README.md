@@ -1,4 +1,4 @@
-# Amazon Price Tracker
+# amzn-track
 
 Scrapes prices of products on Amazon and saves them to a local file for tracking. The prices can be updated and a notification is sent if the new price is lower. 
 
