@@ -1,7 +1,6 @@
 # Amazon Price Tracker
 
-Scrapes prices of products on Amazon and saves them to a local file. The prices can later be compared to see if they have gone down
-
+Scrapes prices of products on Amazon and saves them to a local file for tracking. The prices can be updated and a notification is sent if the new price is lower.
 ## Usage
 
 ```console
