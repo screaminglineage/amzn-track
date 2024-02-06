@@ -4,20 +4,6 @@ Scrapes prices of products on Amazon and saves them to a local file. The prices 
 
 ## Usage
 
-### Linux 
-
-```console
-amazon-price.py [options]
-```
-
-### Windows
-
-```console
-py amazon-price.py [options]
-```
-
-## Help
-
 ```console
 usage: amazon-price [-h] [-u] [url ...]
 
