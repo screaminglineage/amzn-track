@@ -6,13 +6,13 @@ Scrapes prices of products on Amazon and saves them to a local file. The prices 
 
 ### Linux 
 
-```shell
+```console
 amazon-price.py [options]
 ```
 
 ### Windows
 
-```shell
+```console
 py amazon-price.py [options]
 ```
 
