@@ -1,4 +1,5 @@
 #!/bin/bash
+# Original version of the script. Incomplete and doesnt really support updating the prices.
 # Tracks the price of an Amazon product and notifies when its the lowest
 
 SAVE_PATH="/tmp/amazon-price/"
