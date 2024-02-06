@@ -9,7 +9,7 @@ Scrapes prices of products on Amazon and saves them to a local file for tracking
 ## Usage
 
 ```console
-usage: amazon-price.py [-h] [-u] [url ...]
+usage: amzn-track.py [-h] [-u] [url ...]
 
 Save prices of an item from Amazon and update if required
 
