@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 # Top level domain can be changed below
 TOP_LEVEL_DOMAIN = "in"
 AMAZON_PREFIX = f"https://www.amazon.{TOP_LEVEL_DOMAIN}"
+DEFAULT_SAVE_PATH = "amazon-prices.json"
 
 # Available parsers: https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser
 # 'html.parser' is a built-in python alternative to 'lxml' albeit slightly slower
@@ -78,8 +79,10 @@ def url_to_id(url) -> str:
     return product_id.removesuffix("/")
 
 
-def products_add(urls: list[str], filepath="amazon-prices.json"):
-    products = []
+def products_add(urls: list[str], filepath=DEFAULT_SAVE_PATH):
+    with open(filepath, "r") as file:
+        products = json.load(file)
+
     for url in urls:
         prod_id = url_to_id(url)
         if not prod_id:
@@ -112,12 +115,12 @@ def products_add(urls: list[str], filepath="amazon-prices.json"):
         json.dump(products, file)
 
 
-def products_get(filepath="amazon-prices.json") -> list[dict]:
+def products_get(filepath=DEFAULT_SAVE_PATH) -> list[dict]:
     with open(filepath, "r") as file:
         return json.load(file)
 
 
-def products_update(filepath="amazon-prices.json"):
+def products_update(filepath=DEFAULT_SAVE_PATH):
     products = products_get(filepath)
 
     for product in products:
@@ -140,6 +143,11 @@ def products_update(filepath="amazon-prices.json"):
         json.dump(products, file)
 
 
+def products_view(filepath=DEFAULT_SAVE_PATH):
+    with open(filepath, "r") as file:
+        print(json.dumps(json.load(file), indent=2))
+
+
 # Argparse Options
 def cli_parser():
     parser = argparse.ArgumentParser(
@@ -154,6 +162,10 @@ def cli_parser():
     parser.add_argument(
         "-u", "--update", action="store_true", help="update all saved prices"
     )
+
+    parser.add_argument(
+        "-l", "--list", action="store_true", help="list all saved items"
+    )
     return parser
 
 
@@ -161,7 +173,7 @@ def main():
     parser = cli_parser()
     args = parser.parse_args()
 
-    if not (args.urls or args.update):
+    if not (args.urls or args.update or args.list):
         parser.print_help()
         return
 
@@ -172,6 +184,9 @@ def main():
 
     if args.update:
         products_update()
+
+    if args.list:
+        products_view()
 
 
 if __name__ == "__main__":

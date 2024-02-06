@@ -20,3 +20,6 @@ options:
   -h, --help    show this help message and exit
   -u, --update  update all saved prices
 ```
+
+## TODO
+- Detect if item has already been added and skip
