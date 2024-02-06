@@ -19,6 +19,7 @@ positional arguments:
 options:
   -h, --help    show this help message and exit
   -u, --update  update all saved prices
+  -l, --list    list all saved items
 ```
 
 ## TODO
