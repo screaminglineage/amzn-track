@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import requests
+import subprocess
 import argparse
 import json
 from bs4 import BeautifulSoup
@@ -123,7 +124,15 @@ def products_update(filepath="amazon-prices.json"):
         new_price = price_get(get_html(url))
         if new_price != -1 and new_price < product["price"]:
             print(f"New low for item: {product['name']}")
-
+            subprocess.run(
+                [
+                    "notify-send",
+                    "--app-name",
+                    "amazon-price",
+                    f"New Low for Item: {new_price}",
+                    product["name"],
+                ]
+            )
         product["price"] = new_price
 
     with open(filepath, "w") as file:
