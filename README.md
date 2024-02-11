@@ -22,5 +22,3 @@ options:
   -l, --list    list all saved items
 ```
 
-## TODO
-- Detect if item has already been added and skip
