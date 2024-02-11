@@ -144,8 +144,18 @@ def products_update(filepath=DEFAULT_SAVE_PATH):
 
 
 def products_view(filepath=DEFAULT_SAVE_PATH):
+    products = {}
     with open(filepath, "r") as file:
-        print(json.dumps(json.load(file), indent=2))
+        products = json.load(file)
+
+    max_name_length = max(len(item["name"]) for item in products)
+
+    # Print the data with aligned columns
+    print("Saved Products:")
+    for i, product in enumerate(products, start=1):
+        name = product["name"]
+        price = product["price"]
+        print(f"{i}. {name:<{max_name_length}}  {price:>8.2f}")
 
 
 # Argparse Options
