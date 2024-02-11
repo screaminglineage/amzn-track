@@ -79,14 +79,60 @@ def url_to_id(url) -> str:
     return product_id.removesuffix("/")
 
 
-def products_add(urls: list[str], filepath=DEFAULT_SAVE_PATH):
+def products_read(filepath=DEFAULT_SAVE_PATH) -> list[dict]:
     with open(filepath, "r") as file:
-        products = json.load(file)
+        return json.load(file)
+
+
+def products_write(products: list[dict], filepath=DEFAULT_SAVE_PATH):
+    with open(filepath, "w") as file:
+        json.dump(products, file)
+
+
+# Updates the list of products passed and notifies
+def products_update(products: list[dict], filepath=DEFAULT_SAVE_PATH) -> list[dict]:
+    for product in products:
+        url = f"{AMAZON_PREFIX}/dp/{product['id']}"
+        new_price = price_get(get_html(url))
+        if new_price != -1 and new_price < product["price"]:
+            print(f"New low for item: {product['name']}")
+            subprocess.run(
+                [
+                    "notify-send",
+                    "--app-name",
+                    "amazon-price",
+                    f"New Low for Item: {new_price}",
+                    product["name"],
+                ]
+            )
+        product["price"] = new_price
+
+    return products
+
+
+# Returns index of a product or -1 if it doesnt exist
+def product_find(products: list[dict], product_id: str):
+    for i, product in enumerate(products):
+        if product["id"] == product_id:
+            return i
+    return -1
+
+
+def products_add(urls: list[str], filepath=DEFAULT_SAVE_PATH):
+    products = products_read(filepath)
 
     for url in urls:
-        prod_id = url_to_id(url)
-        if not prod_id:
+        product_id = url_to_id(url)
+        if not product_id:
             print(f"Invalid URL/ID: `{url}`")
+            continue
+
+        # Simply update the product if it already exists
+        i = product_find(products, product_id)
+        if i != -1:
+            print("Product already added, Updating instead")
+            updated = products_update([products[i]])
+            products[i] = updated[0]
             continue
 
         html_doc = get_html(url)
@@ -109,44 +155,20 @@ def products_add(urls: list[str], filepath=DEFAULT_SAVE_PATH):
             name = url.removeprefix(f"{AMAZON_PREFIX}/").split("/")[0]
 
         print(f" - Adding {name}")
-        products.append({"id": prod_id, "name": name, "price": price})
+        products.append({"id": product_id, "name": name, "price": price})
 
-    with open(filepath, "w") as file:
-        json.dump(products, file)
-
-
-def products_get(filepath=DEFAULT_SAVE_PATH) -> list[dict]:
-    with open(filepath, "r") as file:
-        return json.load(file)
+    products_write(products, filepath)
 
 
-def products_update(filepath=DEFAULT_SAVE_PATH):
-    products = products_get(filepath)
-
-    for product in products:
-        url = f"{AMAZON_PREFIX}/dp/{product['id']}"
-        new_price = price_get(get_html(url))
-        if new_price != -1 and new_price < product["price"]:
-            print(f"New low for item: {product['name']}")
-            subprocess.run(
-                [
-                    "notify-send",
-                    "--app-name",
-                    "amazon-price",
-                    f"New Low for Item: {new_price}",
-                    product["name"],
-                ]
-            )
-        product["price"] = new_price
-
-    with open(filepath, "w") as file:
-        json.dump(products, file)
+# Updates all products
+def products_update_all(filepath=DEFAULT_SAVE_PATH):
+    products = products_read(filepath)
+    products = products_update(products, filepath)
+    products_write(products)
 
 
 def products_view(filepath=DEFAULT_SAVE_PATH):
-    products = {}
-    with open(filepath, "r") as file:
-        products = json.load(file)
+    products = products_read(filepath)
 
     max_name_length = max(len(item["name"]) for item in products)
 
@@ -193,7 +215,8 @@ def main():
         print("Items Added")
 
     if args.update:
-        products_update()
+        print("Updating All Items")
+        products_update_all()
 
     if args.list:
         products_view()
