@@ -96,6 +96,13 @@ def products_update(products: list[dict], filepath=DEFAULT_SAVE_PATH) -> list[di
         new_price = price_get(get_html(url))
         if new_price != -1 and new_price < product["price"]:
             print(f"New low for item: {product['name']}")
+
+            # Set new lowest
+            if new_price < product["lowest"]:
+                print(f"New lowest for item: {product['name']}")
+                product["lowest"] = new_price
+
+            # Send notification
             subprocess.run(
                 [
                     "notify-send",
@@ -155,7 +162,9 @@ def products_add(urls: list[str], filepath=DEFAULT_SAVE_PATH):
             name = url.removeprefix(f"{AMAZON_PREFIX}/").split("/")[0]
 
         print(f" - Adding {name}")
-        products.append({"id": product_id, "name": name, "price": price})
+        products.append(
+            {"id": product_id, "name": name, "price": price, "lowest": price}
+        )
 
     products_write(products, filepath)
 
@@ -173,11 +182,16 @@ def products_view(filepath=DEFAULT_SAVE_PATH):
     max_name_length = max(len(item["name"]) for item in products)
 
     # Print the data with aligned columns
-    print("Saved Products:")
+    headers = ("Title", "Price", "Lowest")
+    print("\033[1;34m", end="")
+    print(f"   {headers[0]:<{max_name_length}}  {headers[1]:^8} {headers[2]:^8}")
+    print("\033[0m", end="")
+
     for i, product in enumerate(products, start=1):
         name = product["name"]
         price = product["price"]
-        print(f"{i}. {name:<{max_name_length}}  {price:>8.2f}")
+        lowest = product["lowest"]
+        print(f"{i}. {name:<{max_name_length}}  {price:>8.2f} {lowest:>8.2f}")
 
 
 # Argparse Options
