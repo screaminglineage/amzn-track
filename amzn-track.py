@@ -169,6 +169,18 @@ def products_add(urls: list[str], filepath=DEFAULT_SAVE_PATH):
     products_write(products, filepath)
 
 
+# Remove products by their serial numbers
+def products_remove(to_remove: list[int], filepath=DEFAULT_SAVE_PATH):
+    products = products_read(filepath)
+    new_products = []
+    for i, product in enumerate(products, start=1):
+        if i in to_remove:
+            continue
+        new_products.append(product)
+
+    products_write(new_products, filepath)
+
+
 # Updates all products
 def products_update_all(filepath=DEFAULT_SAVE_PATH):
     products = products_read(filepath)
@@ -212,6 +224,15 @@ def cli_parser():
     parser.add_argument(
         "-l", "--list", action="store_true", help="list all saved items"
     )
+
+    parser.add_argument(
+        "-r",
+        "--remove",
+        type=int,
+        metavar="serial_no",
+        nargs="*",
+        help="product to remove",
+    )
     return parser
 
 
@@ -219,8 +240,13 @@ def main():
     parser = cli_parser()
     args = parser.parse_args()
 
-    if not (args.urls or args.update or args.list):
+    if not (args.urls or args.update or args.list or args.remove):
         parser.print_help()
+        return
+
+    if args.remove:
+        products_remove(args.remove)
+        print("Removed Items")
         return
 
     if args.urls:
