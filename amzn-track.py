@@ -94,7 +94,16 @@ def products_update(products: list[dict], filepath=DEFAULT_SAVE_PATH) -> list[di
     for product in products:
         url = f"{AMAZON_PREFIX}/dp/{product['id']}"
         new_price = price_get(get_html(url))
-        if new_price != -1 and new_price < product["price"]:
+
+        # Skip updating price if item out of stock or failed to parse price
+        if new_price == -1:
+            print(f"Item currently out of stock: {product['name']}")
+            continue
+        elif new_price is None:
+            print(f"Failed to get price for: {product['name']}")
+            continue
+
+        if new_price < product["price"]:
             print(f"New low for item: {product['name']}")
 
             # Set new lowest
